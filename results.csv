@@ -1,4 +1,7 @@
-index,nic,name,stream,total_z,combined_maths_grade,physics_grade,chemistry_grade,biology_grade
-2025MB001,991234567V,K. Sutharsan,Maths,5.24,A,B,A,
-2025MB002,992345678X,R. Tharushi,Bio,4.60,,C,B,C
-2025MB003,993456789V,M. Aadhi,Maths,4.90,B,A,C,
+index,nic,name,stream,total_z,district_rank,physics_grade,chemistry_grade,combined_maths_grade,biology_grade
+2025MB001,991234567V,K. Sutharsan,Maths,5.24,1,A,A,A,
+2025MB005,995678901X,M. Anjali,Maths,5.10,2,A,A,A,
+2025MB003,993456789V,M. Aadhi,Maths,4.90,3,A,B,B,
+2025MB006,996789012Y,N. Kavitha,Bio,4.75,4,B,A,,A
+2025MB002,992345678X,R. Tharushi,Bio,4.60,5,B,B,,C
+2025MB004,994567890Z,S. Prakash,Bio,4.30,6,C,B,,B
