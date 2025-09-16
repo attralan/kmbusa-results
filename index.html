@@ -1,75 +1,147 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
- <meta charset="UTF-8" />
- <title>A/L Exam Results Lookup</title>
- <link rel="stylesheet" href="style.css" />
- </head>
- <body>
- <div class="container">
- <h1>A/L Results Lookup</h1>
- <form id="lookupForm">
- <label for="indexInput">Enter your Index Number:</label>
- <input type="text" id="indexInput" maxlength="7" required />
- <button type="submit">Check Result</button>
- <div class="error" id="error"></div>
- </form>
- <div id="result"></div>
- </div>
- <script >document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("lookupForm");
-  const indexInput = document.getElementById("indexInput");
-  const resultDiv = document.getElementById("result");
-  const errorDiv = document.getElementById("error");
-
-  let studentsData = [];
-
-  // Fetch the students.json file
-  fetch('students.json')
-    .then(response => {
-      if (!response.ok) throw new Error("Could not load student data");
-      return response.json();
-    })
-    .then(data => {
-      studentsData = data;
-    })
-    .catch(err => {
-      errorDiv.textContent = "Failed to load student records.";
-      form.style.display = "none";
-    });
-
-  form.addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    const index = indexInput.value.trim();
-    errorDiv.textContent = "";
-    resultDiv.textContent = "";
-
-    // Input validation
-    if (index.length !== 7 || !/^\d+$/.test(index)) {
-      errorDiv.textContent = "Please enter a valid 7-digit index number.";
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kilinochchi A/L Results Portal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e1bee7);
+      margin: 0;
+      padding: 0;
+      color: #333;
     }
-
-    // Search for the student
-    const student = studentsData.find(s => s.index === index);
-
-    if (!student) {
-      errorDiv.textContent = "No results found for this index number.";
-      return;
+    header {
+      background-color: #6a1b9a;
+      color: white;
+      padding: 1rem;
+      text-align: center;
     }
-
-    // Render result
-    let html = `<h2>Result for ${student.name}</h2>`;
-    html += `<ul>`;
-    for (let subject in student.subjects) {
-      html += `<li>${subject}: <strong>${student.subjects[subject]}</strong></li>`;
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    html += `</ul>`;
+    h2 { color: #6a1b9a; }
+    input[type="text"] {
+      width: 100%;
+      padding: .5rem;
+      margin: .5rem 0 1rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #6a1b9a;
+      color: white;
+      padding: .6rem 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #4a148c; }
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #f3e5f5;
+      border-radius: 8px;
+    }
+    .subject { margin-bottom: 1rem; }
+    .grade {
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: .9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kilinochchi A/L Results Portal</h1>
+    <p>Maths & Bio Stream | Chemistry, Physics, Combined Maths / Biology</p>
+  </header>
 
-    resultDiv.innerHTML = html;
-  });
-});
-</script>
- </body>
- </html>
+  <main>
+    <h2>🔍 Search by Index or NIC</h2>
+    <input type="text" id="query" placeholder="Enter index number or NIC" />
+    <button onclick="showResults()">View Results</button>
+
+    <div id="output" class="result" style="display:none;"></div>
+  </main>
+
+  <footer>
+    &copy; 2025 Kilinochchi Maths Bio Students Organization
+  </footer>
+
+  <script>
+    let students = [];
+
+    // Fetch JSON database on load
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => { students = data.students; })
+      .catch(err => {
+        document.getElementById('output').style.display = 'block';
+        document.getElementById('output').innerText = 
+          '⚠️ Failed to load data.json: ' + err;
+      });
+
+    function showResults() {
+      const q = document.getElementById('query').value.trim();
+      const output = document.getElementById('output');
+      output.innerHTML = '';
+      output.style.display = 'none';
+
+      if (!q) {
+        alert('Please enter an index number or NIC.');
+        return;
+      }
+
+      // Find by index or NIC
+      const student = students.find(s => 
+        s.index.toLowerCase() === q.toLowerCase() ||
+        s.nic.toLowerCase() === q.toLowerCase()
+      );
+
+      if (!student) {
+        output.style.display = 'block';
+        output.innerHTML = `<p style="color:red;">
+          ❌ No results found for: <strong>${q}</strong>
+        </p>`;
+        return;
+      }
+
+      // Calculate total Z-score (sum of all three subjects)
+      const zValues = Object.values(student.subjects)
+                            .map(sub => sub.z);
+      const totalZ = zValues
+        .reduce((sum, z) => sum + z, 0)
+        .toFixed(2);
+
+      // Build result display
+      let html = `<h3>👤 ${student.name} (${student.stream} Stream)</h3>`;
+      html += `<p><strong>Total Z-Score (3 subjects):</strong> ${totalZ}</p>`;
+
+      for (const [subj, detail] of Object.entries(student.subjects)) {
+        html += `
+          <div class="subject">
+            <strong>${subj}</strong><br/>
+            Z-Score: ${detail.z.toFixed(2)}<br/>
+            Grade: <span class="grade">${detail.grade}</span>
+          </div>
+        `;
+      }
+
+      output.style.display = 'block';
+      output.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
