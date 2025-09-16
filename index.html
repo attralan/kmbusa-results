@@ -27,12 +27,14 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h2 { color: #6a1b9a; }
+    input[type="file"],
     input[type="text"] {
       width: 100%;
       padding: .5rem;
-      margin: .5rem 0 1rem 0;
+      margin: .5rem 0 1rem;
       border: 1px solid #ccc;
       border-radius: 5px;
+      box-sizing: border-box;
     }
     button {
       background-color: #6a1b9a;
@@ -49,7 +51,9 @@
       background-color: #f3e5f5;
       border-radius: 8px;
     }
-    .subject { margin-bottom: 1rem; }
+    .subject {
+      margin-bottom: 1rem;
+    }
     .grade {
       font-weight: bold;
       color: #2e7d32;
@@ -65,10 +69,13 @@
 <body>
   <header>
     <h1>Kilinochchi A/L Results Portal</h1>
-    <p>Maths & Bio Stream | Chemistry, Physics, Combined Maths / Biology</p>
+    <p>Maths & Bio Stream | Total Z-Score & Grades</p>
   </header>
 
   <main>
+    <h2>📥 Upload CSV Database</h2>
+    <input type="file" id="csvFile" accept=".csv" />
+
     <h2>🔍 Search by Index or NIC</h2>
     <input type="text" id="query" placeholder="Enter index number or NIC" />
     <button onclick="showResults()">View Results</button>
@@ -80,64 +87,80 @@
     &copy; 2025 Kilinochchi Maths Bio Students Organization
   </footer>
 
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     let students = [];
 
-    // Fetch JSON database on load
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => { students = data.students; })
-      .catch(err => {
-        document.getElementById('output').style.display = 'block';
-        document.getElementById('output').innerText = 
-          '⚠️ Failed to load data.json: ' + err;
+    // Load CSV when user selects a file
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete(results) {
+          students = results.data;
+          alert(`✅ Loaded ${students.length} records`);
+        },
+        error(err) {
+          alert('⚠️ Failed to parse CSV: ' + err.message);
+        }
       });
+    });
 
     function showResults() {
-      const q = document.getElementById('query').value.trim();
+      const q = document.getElementById('query').value.trim().toLowerCase();
       const output = document.getElementById('output');
       output.innerHTML = '';
       output.style.display = 'none';
 
+      if (!students.length) {
+        alert('Please upload a CSV file first.');
+        return;
+      }
       if (!q) {
         alert('Please enter an index number or NIC.');
         return;
       }
 
-      // Find by index or NIC
-      const student = students.find(s => 
-        s.index.toLowerCase() === q.toLowerCase() ||
-        s.nic.toLowerCase() === q.toLowerCase()
+      const student = students.find(s =>
+        (s.index || '').toLowerCase() === q ||
+        (s.nic || '').toLowerCase() === q
       );
 
       if (!student) {
         output.style.display = 'block';
         output.innerHTML = `<p style="color:red;">
-          ❌ No results found for: <strong>${q}</strong>
+          ❌ No results found for "<strong>${q}</strong>"
         </p>`;
         return;
       }
 
-      // Calculate total Z-score (sum of all three subjects)
-      const zValues = Object.values(student.subjects)
-                            .map(sub => sub.z);
-      const totalZ = zValues
-        .reduce((sum, z) => sum + z, 0)
-        .toFixed(2);
-
-      // Build result display
+      // Build display: total Z-score + only subject grades
+      const totalZ = parseFloat(student.total_z).toFixed(2);
       let html = `<h3>👤 ${student.name} (${student.stream} Stream)</h3>`;
-      html += `<p><strong>Total Z-Score (3 subjects):</strong> ${totalZ}</p>`;
+      html += `<p><strong>Total Z-Score:</strong> ${totalZ}</p>`;
 
-      for (const [subj, detail] of Object.entries(student.subjects)) {
-        html += `
-          <div class="subject">
-            <strong>${subj}</strong><br/>
-            Z-Score: ${detail.z.toFixed(2)}<br/>
-            Grade: <span class="grade">${detail.grade}</span>
-          </div>
-        `;
-      }
+      // Known subjects
+      const subs = [
+        ['Combined Maths', student.combined_maths_grade],
+        ['Physics', student.physics_grade],
+        ['Chemistry', student.chemistry_grade],
+        ['Biology', student.biology_grade]
+      ];
+
+      subs.forEach(([name, grade]) => {
+        if (grade) {
+          html += `
+            <div class="subject">
+              <strong>${name}</strong><br/>
+              Grade: <span class="grade">${grade}</span>
+            </div>
+          `;
+        }
+      });
 
       output.style.display = 'block';
       output.innerHTML = html;
