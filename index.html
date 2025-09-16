@@ -4,166 +4,214 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kilinochchi A/L Results Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #e0f7fa, #e1bee7);
       margin: 0;
-      padding: 0;
+      font-family: 'Lora', serif;
+      background: #f5f6fa;
       color: #333;
     }
     header {
-      background-color: #6a1b9a;
+      background: linear-gradient(135deg, #4b367c, #9a77ff);
       color: white;
-      padding: 1.5rem 1rem;
       text-align: center;
+      padding: 2rem 1rem;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
     }
     main {
-      max-width: 700px;
+      max-width: 720px;
       margin: 2rem auto;
-      padding: 1.5rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.08);
+      padding: 0 1rem;
     }
-    h2 {
-      color: #6a1b9a;
-      margin-top: 0;
+    .search {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
     }
-    input[type="text"] {
-      width: 100%;
+    .search input {
+      flex: 1;
       padding: 0.6rem;
-      margin: 0.5rem 0 1rem;
-      border: 1px solid #ccc;
+      border: 1px solid #bbb;
       border-radius: 4px;
-      box-sizing: border-box;
+      font-size: 1rem;
     }
-    button {
-      background-color: #6a1b9a;
-      color: white;
+    .search button {
       padding: 0.6rem 1.2rem;
       border: none;
       border-radius: 4px;
+      background: #4b367c;
+      color: white;
+      font-size: 1rem;
       cursor: pointer;
     }
-    button:disabled {
-      background-color: #aaa;
+    .search button:disabled {
+      background: #aaa;
       cursor: not-allowed;
     }
-    .result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background-color: #f3e5f5;
-      border-radius: 6px;
-    }
-    .subject {
+    .loading {
+      font-style: italic;
+      color: #555;
       margin-bottom: 1rem;
     }
-    .grade {
+    .no-result {
+      color: #c0392b;
       font-weight: bold;
-      color: #2e7d32;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .certificate {
+      background: white;
+      border: 2px solid #4b367c;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .cert-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .cert-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #4b367c;
+    }
+    .student-info p {
+      margin: 0.3rem 0;
+    }
+    .student-info strong {
+      display: inline-block;
+      width: 140px;
+      color: #4b367c;
+    }
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+    .score-table th,
+    .score-table td {
+      border: 1px solid #ddd;
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+    }
+    .score-table th {
+      background: #4b367c;
+      color: white;
+    }
+    .score-table td {
+      background: #f9f9fb;
     }
     footer {
       text-align: center;
       padding: 1rem;
       font-size: 0.9rem;
       color: #666;
-    }
-    .loading {
-      margin-top: 1rem;
-      font-style: italic;
-      color: #555;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Kilinochchi A/L Results Portal</h1>
-    <p>Maths & Bio Stream | Total Z-Score & Grades</p>
   </header>
 
   <main>
-    <h2>🔍 Search by Index or NIC</h2>
-    <input type="text" id="query" placeholder="Enter Index Number or NIC" />
-    <button id="searchBtn" onclick="showResults()" disabled>View Results</button>
+    <div class="search">
+      <input type="text" id="query" placeholder="Enter Index Number or NIC" />
+      <button id="searchBtn" onclick="showResults()" disabled>View Results</button>
+    </div>
     <div id="loading" class="loading">Loading data… please wait.</div>
-    <div id="output" class="result" style="display:none;"></div>
+    <div id="no-result" class="no-result" style="display:none;">❌ No results found.</div>
+
+    <div id="certificate" class="certificate" style="display:none;">
+      <div class="cert-header">
+        <h2>G.C.E. (A/L) Examination - 2024</h2>
+      </div>
+      <div class="student-info">
+        <p><strong>Index Number:</strong> <span id="cert-index"></span></p>
+        <p><strong>Name:</strong> <span id="cert-name"></span></p>
+        <p><strong>NIC Number:</strong> <span id="cert-nic"></span></p>
+        <p><strong>Subject Stream:</strong> <span id="cert-stream"></span></p>
+        <p><strong>Total Z-Score:</strong> <span id="cert-zscore"></span></p>
+        <p><strong>District Rank:</strong> <span id="cert-district"></span></p>
+      </div>
+      <table class="score-table">
+        <thead>
+          <tr><th>Subject</th><th>Grade</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Physics</td><td id="cert-physics"></td></tr>
+          <tr><td>Chemistry</td><td id="cert-chemistry"></td></tr>
+          <tr><td>Combined Mathematics</td><td id="cert-combined"></td></tr>
+          <tr><td>Biology</td><td id="cert-biology"></td></tr>
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <footer>
     &copy; 2025 Kilinochchi Maths Bio Students Organization
   </footer>
 
-  <!-- PapaParse (for CSV parsing) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    let students = [];
+    let records = [];
     const searchBtn = document.getElementById('searchBtn');
     const loadingDiv = document.getElementById('loading');
 
-    // Fetch & parse CSV on load
     Papa.parse('results.csv', {
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: results => {
-        students = results.data;
+      complete: res => {
+        records = res.data;
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
-        console.log(`Loaded ${students.length} records`);
       },
       error: err => {
-        loadingDiv.textContent = '⚠️ Failed to load results.csv: ' + err.message;
+        loadingDiv.textContent = '⚠️ Error loading data: ' + err.message;
       }
     });
 
     function showResults() {
       const q = document.getElementById('query').value.trim().toLowerCase();
-      const out = document.getElementById('output');
-      out.innerHTML = '';
-      out.style.display = 'none';
+      const cert = document.getElementById('certificate');
+      const noResult = document.getElementById('no-result');
+
+      cert.style.display = 'none';
+      noResult.style.display = 'none';
 
       if (!q) {
         alert('Please enter an Index Number or NIC.');
         return;
       }
 
-      const student = students.find(s =>
-        (s.index||'').toLowerCase() === q ||
-        (s.nic||'').toLowerCase() === q
+      const rec = records.find(r =>
+        (r.index || '').toLowerCase() === q ||
+        (r.nic || '').toLowerCase() === q
       );
 
-      if (!student) {
-        out.style.display = 'block';
-        out.innerHTML = `<p style="color:red;">
-          ❌ No results found for "<strong>${q}</strong>"
-        </p>`;
+      if (!rec) {
+        noResult.style.display = 'block';
         return;
       }
 
-      const totalZ = parseFloat(student.total_z).toFixed(2);
-      let html = `<h3>👤 ${student.name} (${student.stream} Stream)</h3>`;
-      html += `<p><strong>Total Z-Score:</strong> ${totalZ}</p>`;
+      document.getElementById('cert-index').textContent = rec.index;
+      document.getElementById('cert-name').textContent = rec.name;
+      document.getElementById('cert-nic').textContent = rec.nic;
+      document.getElementById('cert-stream').textContent = rec.stream;
+      document.getElementById('cert-zscore').textContent = parseFloat(rec.total_z).toFixed(4);
+      document.getElementById('cert-district').textContent = rec.district_rank;
+      document.getElementById('cert-physics').textContent = rec.physics_grade;
+      document.getElementById('cert-chemistry').textContent = rec.chemistry_grade;
+      document.getElementById('cert-combined').textContent = rec.combined_maths_grade;
+      document.getElementById('cert-biology').textContent = rec.biology_grade;
 
-      // Only show non-empty grade columns
-      [
-        ['Combined Maths','combined_maths_grade'],
-        ['Physics','physics_grade'],
-        ['Chemistry','chemistry_grade'],
-        ['Biology','biology_grade']
-      ].forEach(([label,key]) => {
-        const grade = student[key];
-        if (grade) {
-          html += `
-            <div class="subject">
-              <strong>${label}</strong><br/>
-              Grade: <span class="grade">${grade}</span>
-            </div>`;
-        }
-      });
-
-      out.style.display = 'block';
-      out.innerHTML = html;
+      cert.style.display = 'block';
     }
   </script>
 </body>
