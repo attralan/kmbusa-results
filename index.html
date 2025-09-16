@@ -12,15 +12,15 @@
     body {
       margin: 0;
       font-family: 'Lora', serif;
-      background: #f5f6fa;
+      background: #f9f9f9;
       color: #333;
     }
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, #4b367c, #9a77ff);
-      color: white;
+      background: linear-gradient(135deg, #00274c, #004080);
+      color: #fff;
       padding: 1.5rem;
     }
     header h1 {
@@ -32,15 +32,15 @@
       max-height: 60px;
     }
     .motivation {
-      background: white;
-      border-left: 4px solid #4b367c;
+      background: #fff;
+      border-left: 4px solid #ffd700;
       margin: 1.5rem auto;
       max-width: 720px;
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       font-style: italic;
       text-align: center;
       font-size: 1.1rem;
-      color: #4b367c;
+      color: #00274c;
     }
     main {
       max-width: 720px;
@@ -55,22 +55,32 @@
     .search input {
       flex: 1;
       padding: 0.6rem;
-      border: 1px solid #bbb;
+      border: 1px solid #00274c;
       border-radius: 4px;
       font-size: 1rem;
+      color: #00274c;
+    }
+    .search input::placeholder {
+      color: #666;
     }
     .search button {
       padding: 0.6rem 1.2rem;
       border: none;
       border-radius: 4px;
-      background: #4b367c;
-      color: white;
+      background: #00274c;
+      color: #ffd700;
       font-size: 1rem;
       cursor: pointer;
+      transition: background 0.3s, color 0.3s;
     }
     .search button:disabled {
-      background: #aaa;
+      background: #999;
+      color: #ddd;
       cursor: not-allowed;
+    }
+    .search button:hover:not(:disabled) {
+      background: #ffd700;
+      color: #00274c;
     }
     .loading {
       font-style: italic;
@@ -84,8 +94,8 @@
       text-align: center;
     }
     .certificate {
-      background: white;
-      border: 2px solid #4b367c;
+      background: #fff;
+      border: 2px solid #ffd700;
       border-radius: 8px;
       padding: 2rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -97,7 +107,7 @@
     .cert-header h2 {
       margin: 0;
       font-size: 1.5rem;
-      color: #4b367c;
+      color: #00274c;
     }
     .student-info p {
       margin: 0.3rem 0;
@@ -105,7 +115,7 @@
     .student-info strong {
       display: inline-block;
       width: 140px;
-      color: #4b367c;
+      color: #00274c;
     }
     .score-table {
       width: 100%;
@@ -119,11 +129,11 @@
       text-align: left;
     }
     .score-table th {
-      background: #4b367c;
-      color: white;
+      background: #00274c;
+      color: #ffd700;
     }
     .score-table td {
-      background: #f9f9fb;
+      background: #fcfcfc;
     }
     footer {
       text-align: center;
@@ -140,12 +150,12 @@
   </header>
 
   <div id="motivation" class="motivation">
-    Preparing for A/L 2025? Every small step today brings you closer to your dream university.
+    Believe in your effort—every revision brings you closer to success in A/L 2025.
   </div>
 
   <main>
     <div class="search">
-      <input type="text" id="query" placeholder="Enter Index Number or NIC" />
+      <input type="text" id="query" placeholder="Enter 5-digit Index or 12-digit NIC" maxlength="12" />
       <button id="searchBtn" onclick="showResults()" disabled>View Results</button>
     </div>
     <div id="loading" class="loading">Loading data… please wait.</div>
@@ -167,9 +177,7 @@
         <thead>
           <tr><th>Subject</th><th>Grade</th></tr>
         </thead>
-        <tbody id="score-body">
-          <!-- rows injected by JS -->
-        </tbody>
+        <tbody id="score-body"></tbody>
       </table>
     </div>
   </main>
@@ -180,18 +188,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    const quotes = [
-      "Believe in yourself—your hard work will shine on exam day.",
-      "Consistency today leads to success tomorrow. Keep going!",
-      "Set a goal for A/L 2025 and take one step closer every day.",
-      "Your dedication is your strongest subject."
-    ];
-    let qIdx = 0;
-    setInterval(() => {
-      document.getElementById('motivation').textContent = quotes[qIdx];
-      qIdx = (qIdx + 1) % quotes.length;
-    }, 5000);
-
     let records = [];
     const searchBtn = document.getElementById('searchBtn');
     const loadingDiv = document.getElementById('loading');
@@ -200,8 +196,8 @@
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: res => {
-        records = res.data;
+      complete: ({ data }) => {
+        records = data;
         loadingDiv.style.display = 'none';
         searchBtn.disabled = false;
       },
@@ -211,21 +207,23 @@
     });
 
     function showResults() {
-      const q = document.getElementById('query').value.trim().toLowerCase();
+      const raw = document.getElementById('query').value.trim();
+      const q = raw.toLowerCase();
       const noResult = document.getElementById('no-result');
-      const cert = document.getElementById('certificate');
+      const cert     = document.getElementById('certificate');
 
       noResult.style.display = 'none';
-      cert.style.display = 'none';
+      cert.style.display     = 'none';
 
-      if (!q) {
-        alert('Please enter an Index Number or NIC.');
+      const isIndex = /^\d{5}$/.test(raw);
+      const isNIC   = /^\d{12}$/.test(raw);
+      if (!isIndex && !isNIC) {
+        alert('Please enter a valid 5-digit Index or 12-digit NIC.');
         return;
       }
 
       const rec = records.find(r =>
-        (r.index  || '').toLowerCase() === q ||
-        (r.nic    || '').toLowerCase() === q
+        isIndex ? r.index === raw : r.nic === raw
       );
 
       if (!rec) {
@@ -233,33 +231,24 @@
         return;
       }
 
-      document.getElementById('cert-index' ).textContent = rec.index;
-      document.getElementById('cert-name'  ).textContent = rec.name;
-      document.getElementById('cert-nic'   ).textContent = rec.nic;
-      document.getElementById('cert-stream').textContent = rec.stream;
-      document.getElementById('cert-zscore').textContent = parseFloat(rec.total_z).toFixed(4);
-      document.getElementById('cert-district').textContent = rec.district_rank;
+      document.getElementById('cert-index').textContent   = rec.index;
+      document.getElementById('cert-name').textContent    = rec.name;
+      document.getElementById('cert-nic').textContent     = rec.nic;
+      document.getElementById('cert-stream').textContent  = rec.stream;
+      document.getElementById('cert-zscore').textContent  = parseFloat(rec.total_z).toFixed(4);
+      document.getElementById('cert-district').textContent= rec.district_rank;
 
       const tbody = document.getElementById('score-body');
       tbody.innerHTML = '';
 
       if (rec.stream.toLowerCase() === 'maths') {
-        tbody.innerHTML += `
-          <tr>
-            <td>Combined Mathematics</td>
-            <td>${rec.combined_maths_grade || '–'}</td>
-          </tr>`;
+        tbody.innerHTML += `<tr><td>Combined Mathematics</td><td>${rec.combined_maths_grade||'–'}</td></tr>`;
       } else {
-        tbody.innerHTML += `
-          <tr>
-            <td>Biology</td>
-            <td>${rec.biology_grade || '–'}</td>
-          </tr>`;
+        tbody.innerHTML += `<tr><td>Biology</td><td>${rec.biology_grade||'–'}</td></tr>`;
       }
-
       tbody.innerHTML += `
-        <tr><td>Physics</td><td>${rec.physics_grade || '–'}</td></tr>
-        <tr><td>Chemistry</td><td>${rec.chemistry_grade || '–'}</td></tr>`;
+        <tr><td>Physics</td><td>${rec.physics_grade||'–'}</td></tr>
+        <tr><td>Chemistry</td><td>${rec.chemistry_grade||'–'}</td></tr>`;
 
       cert.style.display = 'block';
     }
