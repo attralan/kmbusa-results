@@ -15,41 +15,46 @@
     header {
       background-color: #6a1b9a;
       color: white;
-      padding: 1rem;
+      padding: 1.5rem 1rem;
       text-align: center;
     }
     main {
-      max-width: 800px;
+      max-width: 700px;
       margin: 2rem auto;
-      padding: 1rem;
+      padding: 1.5rem;
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.08);
     }
-    h2 { color: #6a1b9a; }
-    input[type="file"],
+    h2 {
+      color: #6a1b9a;
+      margin-top: 0;
+    }
     input[type="text"] {
       width: 100%;
-      padding: .5rem;
-      margin: .5rem 0 1rem;
+      padding: 0.6rem;
+      margin: 0.5rem 0 1rem;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 4px;
       box-sizing: border-box;
     }
     button {
       background-color: #6a1b9a;
       color: white;
-      padding: .6rem 1.2rem;
+      padding: 0.6rem 1.2rem;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
-    button:hover { background-color: #4a148c; }
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
     .result {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       padding: 1rem;
       background-color: #f3e5f5;
-      border-radius: 8px;
+      border-radius: 6px;
     }
     .subject {
       margin-bottom: 1rem;
@@ -61,8 +66,13 @@
     footer {
       text-align: center;
       padding: 1rem;
-      font-size: .9rem;
+      font-size: 0.9rem;
       color: #666;
+    }
+    .loading {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #555;
     }
   </style>
 </head>
@@ -73,13 +83,10 @@
   </header>
 
   <main>
-    <h2>📥 Upload CSV Database</h2>
-    <input type="file" id="csvFile" accept=".csv" />
-
     <h2>🔍 Search by Index or NIC</h2>
-    <input type="text" id="query" placeholder="Enter index number or NIC" />
-    <button onclick="showResults()">View Results</button>
-
+    <input type="text" id="query" placeholder="Enter Index Number or NIC" />
+    <button id="searchBtn" onclick="showResults()" disabled>View Results</button>
+    <div id="loading" class="loading">Loading data… please wait.</div>
     <div id="output" class="result" style="display:none;"></div>
   </main>
 
@@ -87,84 +94,72 @@
     &copy; 2025 Kilinochchi Maths Bio Students Organization
   </footer>
 
-  <!-- PapaParse for CSV parsing -->
+  <!-- PapaParse (for CSV parsing) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     let students = [];
+    const searchBtn = document.getElementById('searchBtn');
+    const loadingDiv = document.getElementById('loading');
 
-    // Load CSV when user selects a file
-    document.getElementById('csvFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete(results) {
-          students = results.data;
-          alert(`✅ Loaded ${students.length} records`);
-        },
-        error(err) {
-          alert('⚠️ Failed to parse CSV: ' + err.message);
-        }
-      });
+    // Fetch & parse CSV on load
+    Papa.parse('results.csv', {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: results => {
+        students = results.data;
+        loadingDiv.style.display = 'none';
+        searchBtn.disabled = false;
+        console.log(`Loaded ${students.length} records`);
+      },
+      error: err => {
+        loadingDiv.textContent = '⚠️ Failed to load results.csv: ' + err.message;
+      }
     });
 
     function showResults() {
       const q = document.getElementById('query').value.trim().toLowerCase();
-      const output = document.getElementById('output');
-      output.innerHTML = '';
-      output.style.display = 'none';
+      const out = document.getElementById('output');
+      out.innerHTML = '';
+      out.style.display = 'none';
 
-      if (!students.length) {
-        alert('Please upload a CSV file first.');
-        return;
-      }
       if (!q) {
-        alert('Please enter an index number or NIC.');
+        alert('Please enter an Index Number or NIC.');
         return;
       }
 
       const student = students.find(s =>
-        (s.index || '').toLowerCase() === q ||
-        (s.nic || '').toLowerCase() === q
+        (s.index||'').toLowerCase() === q ||
+        (s.nic||'').toLowerCase() === q
       );
 
       if (!student) {
-        output.style.display = 'block';
-        output.innerHTML = `<p style="color:red;">
+        out.style.display = 'block';
+        out.innerHTML = `<p style="color:red;">
           ❌ No results found for "<strong>${q}</strong>"
         </p>`;
         return;
       }
 
-      // Build display: total Z-score + only subject grades
       const totalZ = parseFloat(student.total_z).toFixed(2);
       let html = `<h3>👤 ${student.name} (${student.stream} Stream)</h3>`;
       html += `<p><strong>Total Z-Score:</strong> ${totalZ}</p>`;
 
-      // Known subjects
-      const subs = [
-        ['Combined Maths', student.combined_maths_grade],
-        ['Physics', student.physics_grade],
-        ['Chemistry', student.chemistry_grade],
-        ['Biology', student.biology_grade]
-      ];
-
-      subs.forEach(([name, grade]) => {
+      // Only show non-empty grade columns
+      [
+        ['Combined Maths','combined_maths_grade'],
+        ['Physics','physics_grade'],
+        ['Chemistry','chemistry_grade'],
+        ['Biology','biology_grade']
+      ].forEach(([label,key]) => {
+        const grade = student[key];
         if (grade) {
           html += `
             <div class="subject">
-              <strong>${name}</strong><br/>
+              <strong>${label}</strong><br/>
               Grade: <span class="grade">${grade}</span>
-            </div>
-          `;
+            </div>`;
         }
       });
 
-      output.style.display = 'block';
-      output.innerHTML = html;
-    }
-  </script>
-</body>
-</html>
+      out.style.display = 'block
