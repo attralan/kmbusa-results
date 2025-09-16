@@ -1,0 +1,75 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+ <meta charset="UTF-8" />
+ <title>A/L Exam Results Lookup</title>
+ <link rel="stylesheet" href="style.css" />
+ </head>
+ <body>
+ <div class="container">
+ <h1>A/L Results Lookup</h1>
+ <form id="lookupForm">
+ <label for="indexInput">Enter your Index Number:</label>
+ <input type="text" id="indexInput" maxlength="7" required />
+ <button type="submit">Check Result</button>
+ <div class="error" id="error"></div>
+ </form>
+ <div id="result"></div>
+ </div>
+ <script >document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("lookupForm");
+  const indexInput = document.getElementById("indexInput");
+  const resultDiv = document.getElementById("result");
+  const errorDiv = document.getElementById("error");
+
+  let studentsData = [];
+
+  // Fetch the students.json file
+  fetch('students.json')
+    .then(response => {
+      if (!response.ok) throw new Error("Could not load student data");
+      return response.json();
+    })
+    .then(data => {
+      studentsData = data;
+    })
+    .catch(err => {
+      errorDiv.textContent = "Failed to load student records.";
+      form.style.display = "none";
+    });
+
+  form.addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const index = indexInput.value.trim();
+    errorDiv.textContent = "";
+    resultDiv.textContent = "";
+
+    // Input validation
+    if (index.length !== 7 || !/^\d+$/.test(index)) {
+      errorDiv.textContent = "Please enter a valid 7-digit index number.";
+      return;
+    }
+
+    // Search for the student
+    const student = studentsData.find(s => s.index === index);
+
+    if (!student) {
+      errorDiv.textContent = "No results found for this index number.";
+      return;
+    }
+
+    // Render result
+    let html = `<h2>Result for ${student.name}</h2>`;
+    html += `<ul>`;
+    for (let subject in student.subjects) {
+      html += `<li>${subject}: <strong>${student.subjects[subject]}</strong></li>`;
+    }
+    html += `</ul>`;
+
+    resultDiv.innerHTML = html;
+  });
+});
+</script>
+ </body>
+ </html>
