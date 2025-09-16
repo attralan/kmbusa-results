@@ -6,6 +6,9 @@
   <title>Kilinochchi A/L Results Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       font-family: 'Lora', serif;
@@ -13,15 +16,35 @@
       color: #333;
     }
     header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       background: linear-gradient(135deg, #4b367c, #9a77ff);
-      color: #fff;
-      text-align: center;
-      padding: 2rem 1rem;
+      color: white;
+      padding: 1.5rem;
     }
-    header h1 { margin: 0; font-size: 2rem; }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+    header img {
+      max-height: 60px;
+    }
+    .motivation {
+      background: white;
+      border-left: 4px solid #4b367c;
+      margin: 1.5rem auto;
+      max-width: 720px;
+      padding: 1rem;
+      font-style: italic;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #4b367c;
+    }
     main {
       max-width: 720px;
-      margin: 2rem auto;
+      margin: 0 auto 2rem;
       padding: 0 1rem;
     }
     .search {
@@ -41,7 +64,7 @@
       border: none;
       border-radius: 4px;
       background: #4b367c;
-      color: #fff;
+      color: white;
       font-size: 1rem;
       cursor: pointer;
     }
@@ -61,7 +84,7 @@
       text-align: center;
     }
     .certificate {
-      background: #fff;
+      background: white;
       border: 2px solid #4b367c;
       border-radius: 8px;
       padding: 2rem;
@@ -97,7 +120,7 @@
     }
     .score-table th {
       background: #4b367c;
-      color: #fff;
+      color: white;
     }
     .score-table td {
       background: #f9f9fb;
@@ -107,14 +130,18 @@
       padding: 1rem;
       font-size: 0.9rem;
       color: #666;
-      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Kilinochchi A/L Results Portal</h1>
+    <img src="kmbusa_logo.png" alt="KMBUSA Logo" />
   </header>
+
+  <div id="motivation" class="motivation">
+    Preparing for A/L 2025? Every small step today brings you closer to your dream university.
+  </div>
 
   <main>
     <div class="search">
@@ -153,11 +180,22 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
+    const quotes = [
+      "Believe in yourself—your hard work will shine on exam day.",
+      "Consistency today leads to success tomorrow. Keep going!",
+      "Set a goal for A/L 2025 and take one step closer every day.",
+      "Your dedication is your strongest subject."
+    ];
+    let qIdx = 0;
+    setInterval(() => {
+      document.getElementById('motivation').textContent = quotes[qIdx];
+      qIdx = (qIdx + 1) % quotes.length;
+    }, 5000);
+
     let records = [];
     const searchBtn = document.getElementById('searchBtn');
     const loadingDiv = document.getElementById('loading');
 
-    // Auto-fetch & parse CSV
     Papa.parse('results.csv', {
       download: true,
       header: true,
@@ -195,7 +233,6 @@
         return;
       }
 
-      // Populate student info
       document.getElementById('cert-index' ).textContent = rec.index;
       document.getElementById('cert-name'  ).textContent = rec.name;
       document.getElementById('cert-nic'   ).textContent = rec.nic;
@@ -203,11 +240,9 @@
       document.getElementById('cert-zscore').textContent = parseFloat(rec.total_z).toFixed(4);
       document.getElementById('cert-district').textContent = rec.district_rank;
 
-      // Build subject → grade rows in desired order
       const tbody = document.getElementById('score-body');
-      tbody.innerHTML = '';  // clear previous
+      tbody.innerHTML = '';
 
-      // 1) Maths or Biology
       if (rec.stream.toLowerCase() === 'maths') {
         tbody.innerHTML += `
           <tr>
@@ -222,19 +257,9 @@
           </tr>`;
       }
 
-      // 2) Physics
       tbody.innerHTML += `
-        <tr>
-          <td>Physics</td>
-          <td>${rec.physics_grade || '–'}</td>
-        </tr>`;
-
-      // 3) Chemistry
-      tbody.innerHTML += `
-        <tr>
-          <td>Chemistry</td>
-          <td>${rec.chemistry_grade || '–'}</td>
-        </tr>`;
+        <tr><td>Physics</td><td>${rec.physics_grade || '–'}</td></tr>
+        <tr><td>Chemistry</td><td>${rec.chemistry_grade || '–'}</td></tr>`;
 
       cert.style.display = 'block';
     }
