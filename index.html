@@ -1,279 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KMBUSA Pilot A/L Exams 2025 Results Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Lora', serif;
-      background: #f9f9f9;
-      color: #333;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(135deg, #00274c, #004080);
-      padding: 1.5rem;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-    header img {
-      max-height: 60px;
-    }
-    .motivation {
-      background: #fff;
-      border-left: 4px solid #ffd700;
-      margin: 1.5rem auto;
-      max-width: 720px;
-      padding: 1rem 1.5rem;
-      font-style: italic;
-      text-align: center;
-      font-size: 1.1rem;
-      color: #00274c;
-    }
-    main {
-      max-width: 720px;
-      margin: 0 auto 2rem;
-      padding: 0 1rem;
-    }
-    .search {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .search input {
-      flex: 1;
-      padding: 0.6rem;
-      border: 1px solid #00274c;
-      border-radius: 4px;
-      font-size: 1rem;
-      color: #00274c;
-    }
-    .search input::placeholder {
-      color: #666;
-    }
-    .search button {
-      padding: 0.6rem 1.2rem;
-      border: none;
-      border-radius: 4px;
-      background: #00274c;
-      color: #ffd700;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, border 0.3s;
-    }
-    .search button:disabled {
-      background: #999;
-      color: #ddd;
-      cursor: not-allowed;
-    }
-    .search button:hover:not(:disabled) {
-      background: #fff;
-      color: #00274c;
-      border: 1px solid #00274c;
-    }
-    .loading {
-      font-style: italic;
-      color: #555;
-      margin-bottom: 1rem;
-    }
-    .no-result {
-      color: #c0392b;
-      font-weight: bold;
-      margin-top: 1rem;
-      text-align: center;
-    }
-    .certificate {
-      background: #fff;
-      border: 2px solid #ffd700;
-      border-radius: 8px;
-      padding: 2rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .cert-header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    .cert-header h2 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: #00274c;
-    }
-    .student-info p {
-      margin: 0.3rem 0;
-    }
-    .student-info strong {
-      display: inline-block;
-      width: 140px;
-      color: #00274c;
-    }
-    .score-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.5rem;
-    }
-    .score-table th,
-    .score-table td {
-      border: 1px solid #ddd;
-      padding: 0.6rem 0.8rem;
-      text-align: left;
-    }
-    .score-table th {
-      background: #00274c;
-      color: #ffd700;
-    }
-    .score-table td {
-      background: #fcfcfc;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KMBUSA Pilot A/L Results 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Lora',serif;background:#f9f9f9;color:#333;}
+header{display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(135deg,#00274c,#004080);color:white;padding:1rem;flex-wrap:wrap;}
+header img{max-height:60px;}
+main{max-width:720px;margin:auto;padding:1rem;}
+.search{display:flex;gap:0.5rem;margin-bottom:1.5rem;}
+.search input{flex:1;padding:0.6rem;border:1px solid #00274c;border-radius:4px;}
+.search button{background:#00274c;color:#ffd700;border:none;border-radius:4px;
+  padding:0.6rem 1.2rem;cursor:pointer;transition:0.3s;}
+.search button:hover:not(:disabled){background:#fff;color:#00274c;border:1px solid #00274c;}
+.certificate{background:#fff;border:2px solid #ffd700;border-radius:8px;padding:1.5rem;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);display:none;}
+.cert-header{text-align:center;margin-bottom:1rem;}
+.student-info p{margin:0.3rem 0;}
+.student-info strong{display:inline-block;width:140px;color:#00274c;}
+.score-table{width:100%;border-collapse:collapse;margin-top:1rem;}
+.score-table th,.score-table td{border:1px solid #ddd;padding:0.5rem;text-align:left;}
+.score-table th{background:#00274c;color:#ffd700;}
+.chart-container{height:260px;margin-top:1.5rem;}
+.print-btn,.rank-btn{display:block;width:100%;background:#004080;color:#fff;
+  border:none;border-radius:4px;padding:0.8rem;margin-top:1rem;font-size:1rem;
+  cursor:pointer;transition:0.3s;}
+.print-btn:hover,.rank-btn:hover{background:#ffd700;color:#00274c;}
+footer{text-align:center;padding:1rem;color:#666;}
+.no-result{text-align:center;color:#c0392b;margin-top:1rem;}
+@media(max-width:600px){.student-info strong{width:120px;}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>KMBUSA Pilot A/L Exams 2025 Results Portal</h1>
-    <img src="kmbusa_logo.png" alt="KMBUSA Logo" />
-  </header>
+<header>
+  <h1>KMBUSA A/L Results 2025</h1>
+  <img src="kmbusa_logo.png" alt="KMBUSA Logo">
+</header>
 
-  <div id="motivation" class="motivation">
-    Believe in your effort—every revision brings you closer to success in A/L 2025.
+<main>
+  <div class="search">
+    <input id="query" placeholder="Enter Index or NIC" maxlength="12">
+    <button id="searchBtn" disabled>View Results</button>
   </div>
+  <div id="loading">Loading data…</div>
+  <div id="no-result" class="no-result" style="display:none;">❌ No results found.</div>
 
-  <main>
-    <div class="search">
-      <input
-        type="text"
-        id="query"
-        placeholder="Enter 5-digit Index or 12-digit NIC"
-        maxlength="12"
-      />
-      <button id="searchBtn" onclick="showResults()" disabled>
-        View Results
-      </button>
+  <div id="certificate" class="certificate">
+    <div class="cert-header"><h2>G.C.E. (A/L) Examination – 2025</h2></div>
+    <div class="student-info">
+      <p><strong>Index:</strong> <span id="cert-index"></span></p>
+      <p><strong>Name:</strong> <span id="cert-name"></span></p>
+      <p><strong>NIC:</strong> <span id="cert-nic"></span></p>
+      <p><strong>Stream:</strong> <span id="cert-stream"></span></p>
+      <p><strong>Total Z:</strong> <span id="cert-z"></span></p>
+      <p><strong>District Rank:</strong> <span id="cert-rank"></span></p>
     </div>
-    <div id="loading" class="loading">Loading data… please wait.</div>
-    <div id="no-result" class="no-result" style="display: none;">
-      ❌ No results found.
-    </div>
+    <table class="score-table">
+      <thead><tr><th>Subject</th><th>Grade</th></tr></thead>
+      <tbody id="score-body"></tbody>
+    </table>
+    <div class="chart-container"><canvas id="rankChart"></canvas></div>
+    <button class="rank-btn" id="viewRankBtn">📊 View Rank Position</button>
+    <button class="print-btn" onclick="window.print()">🖨️ Print Result Sheet</button>
+  </div>
+</main>
 
-    <div id="certificate" class="certificate" style="display: none;">
-      <div class="cert-header">
-        <h2>G.C.E. (A/L) Examination – 2025</h2>
-      </div>
-      <div class="student-info">
-        <p><strong>Index Number:</strong> <span id="cert-index"></span></p>
-        <p><strong>Name:</strong> <span id="cert-name"></span></p>
-        <p><strong>NIC Number:</strong> <span id="cert-nic"></span></p>
-        <p><strong>Subject Stream:</strong> <span id="cert-stream"></span></p>
-        <p><strong>Total Z-Score:</strong> <span id="cert-zscore"></span></p>
-        <p><strong>District Rank:</strong> <span id="cert-district"></span></p>
-      </div>
-      <table class="score-table">
-        <thead>
-          <tr><th>Subject</th><th>Grade</th></tr>
-        </thead>
-        <tbody id="score-body">
-          <!-- injected by JS -->
-        </tbody>
-      </table>
-    </div>
-  </main>
+<footer>&copy; 2025 Kilinochchi Maths Bio Students Association</footer>
 
-  <footer>
-    &copy; 2025 Kilinochchi Maths Bio Students Organization
-  </footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let results=[]; let chart=null; 
+const btn=document.getElementById('searchBtn'); 
+const loading=document.getElementById('loading');
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script>
-    let records = [];
-    const searchBtn = document.getElementById('searchBtn');
-    const loadingDiv = document.getElementById('loading');
+fetch('results_base64.txt')
+.then(r=>r.text())
+.then(b64=>{const csv=atob(b64.trim());parseCSV(csv);})
+.catch(err=>{loading.textContent='Error loading results: '+err.message;});
 
-    Papa.parse('results.csv', {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: ({ data }) => {
-        records = data;
-        loadingDiv.style.display = 'none';
-        searchBtn.disabled = false;
+function parseCSV(csvText){
+  const lines=csvText.split(/\r?\n/).filter(l=>l.trim());
+  const headers=lines[0].split(',');
+  results=lines.slice(1).map(l=>{
+    const cells=l.split(',');
+    const rec={};
+    headers.forEach((h,i)=>rec[h.trim().toLowerCase()]=cells[i]?cells[i].trim():"");
+    rec.total_z=parseFloat(rec.total_z||"0");
+    rec.district_rank=parseInt(rec.district_rank||"0");
+    return rec;
+  });
+  btn.disabled=false;loading.style.display="none";
+}
+
+btn.onclick=()=>{
+  const q=document.getElementById('query').value.trim();
+  const rec=results.find(r=>r.index===q||r.nic===q||r.nic_number===q);
+  const cert=document.getElementById('certificate');
+  document.getElementById('no-result').style.display=rec?"none":"block";
+  if(!rec){cert.style.display="none";return;}
+  cert.style.display="block";
+  showResult(rec);
+};
+
+function showResult(rec){
+  document.getElementById('cert-index').textContent=rec.index;
+  document.getElementById('cert-name').textContent=rec.name;
+  document.getElementById('cert-nic').textContent=rec.nic||rec.nic_number;
+  document.getElementById('cert-stream').textContent=rec.stream.toUpperCase();
+  document.getElementById('cert-z').textContent=isNaN(rec.total_z)?"—":rec.total_z.toFixed(4);
+  document.getElementById('cert-rank').textContent=rec.district_rank||"—";
+  const tbody=document.getElementById('score-body');
+  tbody.innerHTML="";
+  tbody.innerHTML+=`<tr><td>Physics</td><td>${rec.physics_grade||"—"}</td></tr>`;
+  tbody.innerHTML+=`<tr><td>Chemistry</td><td>${rec.chemistry_grade||"—"}</td></tr>`;
+  if(rec.stream.toLowerCase()==='maths'){
+    tbody.innerHTML+=`<tr><td>Combined Mathematics</td><td>${rec.combined_maths_grade||"—"}</td></tr>`;
+  } else if(rec.stream.toLowerCase()==='bio'){
+    tbody.innerHTML+=`<tr><td>Biology</td><td>${rec.biology_grade||"—"}</td></tr>`;
+  }
+  drawZChart(rec);
+  document.getElementById('viewRankBtn').onclick=()=>drawRankChart(rec);
+}
+
+function drawZChart(rec){
+  const ctx=document.getElementById('rankChart');
+  if(chart) chart.destroy();
+  chart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:[rec.index],
+      datasets:[{label:'Your Z-Score',data:[rec.total_z],backgroundColor:'#ffd700'}]},
+    options:{responsive:true,scales:{y:{min:-4,max:4,title:{display:true,text:'Z-Score Range'}}},
+      plugins:{legend:{display:false}}}
+  });
+}
+
+function drawRankChart(rec){
+  const ctx=document.getElementById('rankChart');
+  if(chart) chart.destroy();
+  const stream=rec.stream.toLowerCase();
+  const sameStream=results.filter(r=>r.stream.toLowerCase()===stream&&r.total_z>-10);
+  const ranks=sameStream.map(r=>({z:r.total_z,index:r.index}))
+    .sort((a,b)=>b.z-a.z);
+  const xs=ranks.map((_,i)=>i+1);
+  const ys=ranks.map(r=>r.z);
+  const you=ranks.findIndex(r=>r.index===rec.index);
+  chart=new Chart(ctx,{
+    type:'scatter',
+    data:{
+      datasets:[
+        {label:'Students',data:xs.map((x,i)=>({x:x,y:ys[i]})),backgroundColor:'rgba(0,0,0,0.3)'},
+        {label:'You',data:[{x:you+1,y:rec.total_z}],backgroundColor:'#ffd700',pointRadius:8}
+      ]
+    },
+    options:{
+      responsive:true,
+      scales:{
+        x:{title:{display:true,text:`District Rank among ${stream.toUpperCase()} Stream`}},
+        y:{min:-4,max:4,title:{display:true,text:'Z-Score'}}
       },
-      error: err => {
-        loadingDiv.textContent = '⚠️ Error loading data: ' + err.message;
-      }
-    });
-
-    function showResults() {
-      const raw = document.getElementById('query').value.trim();
-      const isIndex = /^\d{5}$/.test(raw);
-      const isNIC   = /^\d{12}$/.test(raw);
-      if (!isIndex && !isNIC) {
-        alert('Please enter a valid 5-digit Index or 12-digit NIC.');
-        return;
-      }
-
-      const q       = raw;
-      const noResult = document.getElementById('no-result');
-      const cert     = document.getElementById('certificate');
-      noResult.style.display = 'none';
-      cert.style.display     = 'none';
-
-      const rec = records.find(r =>
-        isIndex ? r.index === q : r.nic === q
-      );
-
-      if (!rec) {
-        noResult.style.display = 'block';
-        return;
-      }
-
-      // populate certificate
-      document.getElementById('cert-index').textContent    = rec.index;
-      document.getElementById('cert-name').textContent     = rec.name;
-      document.getElementById('cert-nic').textContent      = rec.nic;
-      document.getElementById('cert-stream').textContent   = rec.stream;
-      document.getElementById('cert-zscore').textContent   = parseFloat(rec.total_z).toFixed(4);
-      document.getElementById('cert-district').textContent = rec.district_rank;
-
-      // build subject rows
-      const tbody = document.getElementById('score-body');
-      tbody.innerHTML = '';
-      if (rec.stream.toLowerCase() === 'maths') {
-        tbody.innerHTML += `
-          <tr><td>Combined Mathematics</td>
-              <td>${rec.combined_maths_grade || '–'}</td>
-          </tr>`;
-      } else {
-        tbody.innerHTML += `
-          <tr><td>Biology</td>
-              <td>${rec.biology_grade || '–'}</td>
-          </tr>`;
-      }
-      tbody.innerHTML += `
-        <tr><td>Physics</td>
-            <td>${rec.physics_grade || '–'}</td>
-        </tr>
-        <tr><td>Chemistry</td>
-            <td>${rec.chemistry_grade || '–'}</td>
-        </tr>`;
-
-      cert.style.display = 'block';
+      plugins:{legend:{display:false}}
     }
-  </script>
+  });
+}
+</script>
 </body>
 </html>
